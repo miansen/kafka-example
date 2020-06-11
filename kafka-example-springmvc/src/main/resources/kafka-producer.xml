@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 读取配置文件 -->
+	<bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:application.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	 <!-- 配置生产者的属性 -->  
+     <bean id="kafkaProducerProperties" class="java.util.HashMap">  
+        <constructor-arg>  
+            <map>  
+                <entry key="bootstrap.servers" value="${bootstrap.servers}"/>
+                <entry key="acks" value="${acks}"/>
+                <entry key="retries" value="${retries}"/>  
+                <entry key="batch.size" value="${batch.size}"/>  
+                <entry key="linger.ms" value="${linger.ms}"/>  
+                <entry key="buffer.memory" value="${buffer.memory}"/>  
+                <entry key="key.serializer" value="${key.serializer}"/>  
+                <entry key="value.serializer" value="${value.serializer}"/>
+                <entry key="key.deserializer" value="${key.deserializer}"/>  
+                <entry key="value.deserializer" value="${value.deserializer}"/> 
+            </map>  
+        </constructor-arg>  
+     </bean>  
+	
+	<!-- 创建 kafkaProducerTemplate 需要使用的 kafkaProducerFactory bean -->
+     <bean id="kafkaProducerFactory" class="org.springframework.kafka.core.DefaultKafkaProducerFactory">  
+        <constructor-arg ref="kafkaProducerProperties" /> 
+     </bean>
+     
+     <!-- 创建 kafkaTemplate bean，使用的时候，只需要注入这个 bean，即可使用 template 的 send 消息方法 -->
+     <bean id="kafkaTemplate" class="org.springframework.kafka.core.KafkaTemplate">  
+        <constructor-arg ref="kafkaProducerFactory"/>
+        <!--设置对应 topic-->
+        <property name="defaultTopic" value="test01"/>
+     </bean>
+     
+    <!-- 生产者 -->
+	<bean id="kafkaProducerService" class="wang.miansen.kafka.springmvc.KafkaProducerService" />
+</beans>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 读取配置文件 -->
+	<bean id="propertyPlaceholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:application.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 配置消费者的属性 -->
+	<bean id="kafkaConsumerProperties" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="bootstrap.servers" value="${bootstrap.servers}" />
+				<entry key="group.id" value="${group.id}" />
+				<entry key="enable.auto.commit" value="${enable.auto.commit}" />
+				<entry key="session.timeout.ms" value="${session.timeout.ms}" />
+				<entry key="auto.commit.interval.ms" value="${auto.commit.interval.ms}" />
+				<entry key="key.serializer" value="${key.serializer}" />
+				<entry key="value.serializer" value="${value.serializer}" />
+				<entry key="key.deserializer" value="${key.deserializer}" />
+				<entry key="value.deserializer" value="${value.deserializer}" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- 创建 kafkaConsumerFactory bean -->
+	<bean id="kafkaConsumerFactory"
+		class="org.springframework.kafka.core.DefaultKafkaConsumerFactory">
+		<constructor-arg ref="kafkaConsumerProperties" />
+	</bean>
+
+	<!--具体监听的 bean -->
+	<bean id="kafkaConsumerListener1" class="wang.miansen.kafka.springmvc.KafkaConsumerListener1" />
+	<bean id="kafkaConsumerListener2" class="wang.miansen.kafka.springmvc.KafkaConsumerListener2" />
+
+	<!-- 消费者容器配置信息 -->
+	<bean id="kafkaMessageListenerContainerProperties1"
+		class="org.springframework.kafka.listener.config.ContainerProperties">
+		<!-- 订阅主题 -->
+		<constructor-arg value="test01" />
+		<property name="messageListener" ref="kafkaConsumerListener1" />
+	</bean>
+	<bean id="kafkaMessageListenerContainerProperties2"
+		class="org.springframework.kafka.listener.config.ContainerProperties">
+		<!-- 订阅主题 -->
+		<constructor-arg value="test01" />
+		<property name="messageListener" ref="kafkaConsumerListener2" />
+	</bean>
+
+	<!-- 配置消费者容器 -->
+	<bean id="kafkaMessageListenerContainer1"
+		class="org.springframework.kafka.listener.KafkaMessageListenerContainer"
+		init-method="doStart">
+		<constructor-arg ref="kafkaConsumerFactory" />
+		<constructor-arg ref="kafkaMessageListenerContainerProperties1" />
+	</bean>
+	<bean id="kafkaMessageListenerContainer2"
+		class="org.springframework.kafka.listener.KafkaMessageListenerContainer"
+		init-method="doStart">
+		<constructor-arg ref="kafkaConsumerFactory" />
+		<constructor-arg ref="kafkaMessageListenerContainerProperties2" />
+	</bean>
+
+</beans>

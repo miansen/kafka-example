@@ -17,6 +17,7 @@
   </properties>
 
   <modules>
-    <module>javaclient-kafka-example</module>
+    <module>kafka-example-javaclient</module>
+    <module>kafka-example-springmvc</module>
   </modules>
 </project>

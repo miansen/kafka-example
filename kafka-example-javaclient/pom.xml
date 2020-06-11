@@ -9,8 +9,8 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>javaclient-kafka-example</artifactId>
-	<name>javaclient-kafka-example</name>
+	<artifactId>kafka-example-javaclient</artifactId>
+	<name>kafka-example-javaclient</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
