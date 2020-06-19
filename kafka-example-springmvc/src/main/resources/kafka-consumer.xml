@@ -35,16 +35,39 @@
 			</map>
 		</constructor-arg>
 	</bean>
+	
+	<!-- 配置消费者的属性 -->
+	<bean id="kafkaConsumerProperties2" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="bootstrap.servers" value="${bootstrap.servers}" />
+				<!-- 注意消费者组不一样 -->
+				<entry key="group.id" value="my-consumer-group-05" />
+				<entry key="enable.auto.commit" value="${enable.auto.commit}" />
+				<entry key="session.timeout.ms" value="${session.timeout.ms}" />
+				<entry key="auto.commit.interval.ms" value="${auto.commit.interval.ms}" />
+				<entry key="key.serializer" value="${key.serializer}" />
+				<entry key="value.serializer" value="${value.serializer}" />
+				<entry key="key.deserializer" value="${key.deserializer}" />
+				<entry key="value.deserializer" value="${value.deserializer}" />
+			</map>
+		</constructor-arg>
+	</bean>
 
 	<!-- 创建 kafkaConsumerFactory bean -->
 	<bean id="kafkaConsumerFactory"
 		class="org.springframework.kafka.core.DefaultKafkaConsumerFactory">
 		<constructor-arg ref="kafkaConsumerProperties" />
 	</bean>
+	<bean id="kafkaConsumerFactory2"
+		class="org.springframework.kafka.core.DefaultKafkaConsumerFactory">
+		<constructor-arg ref="kafkaConsumerProperties2" />
+	</bean>
 
 	<!--具体监听的 bean -->
 	<bean id="kafkaConsumerListener1" class="wang.miansen.kafka.springmvc.KafkaConsumerListener1" />
 	<bean id="kafkaConsumerListener2" class="wang.miansen.kafka.springmvc.KafkaConsumerListener2" />
+	<bean id="kafkaConsumerListener3" class="wang.miansen.kafka.springmvc.KafkaConsumerListener3" />
 
 	<!-- 消费者容器配置信息 -->
 	<bean id="kafkaMessageListenerContainerProperties1"
@@ -59,6 +82,12 @@
 		<constructor-arg value="test01" />
 		<property name="messageListener" ref="kafkaConsumerListener2" />
 	</bean>
+	<bean id="kafkaMessageListenerContainerProperties3"
+		class="org.springframework.kafka.listener.config.ContainerProperties">
+		<!-- 订阅主题 -->
+		<constructor-arg value="test01" />
+		<property name="messageListener" ref="kafkaConsumerListener3" />
+	</bean>
 
 	<!-- 配置消费者容器 -->
 	<bean id="kafkaMessageListenerContainer1"
@@ -72,6 +101,12 @@
 		init-method="doStart">
 		<constructor-arg ref="kafkaConsumerFactory" />
 		<constructor-arg ref="kafkaMessageListenerContainerProperties2" />
+	</bean>
+	<bean id="kafkaMessageListenerContainer3"
+		class="org.springframework.kafka.listener.KafkaMessageListenerContainer"
+		init-method="doStart">
+		<constructor-arg ref="kafkaConsumerFactory2" />
+		<constructor-arg ref="kafkaMessageListenerContainerProperties3" />
 	</bean>
 
 </beans>

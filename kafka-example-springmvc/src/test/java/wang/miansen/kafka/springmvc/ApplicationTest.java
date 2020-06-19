@@ -22,5 +22,6 @@ public class ApplicationTest {
 		for (int i = 0; i < 10; i++) {
 			producerService.sendMessage(Integer.toString(i), "hello kafka-" + i);
 		}
+		System.in.read(); // 让 main 线程阻塞一下，否则消费者线程可能会来不及消费就死了
 	}
 }
